@@ -1,18 +1,19 @@
-/*
- * Copyright (C) 2017 The Android Open Source Project
+/**
+ * Copyright 2020 Google LLC. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
-package com.google.sample.cast.castconnect.ui;
+package com.google.sample.cast.atvreceiver.ui;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -49,28 +50,13 @@ import com.google.android.gms.cast.tv.media.MediaStatusWriter;
 import com.google.android.gms.common.images.WebImage;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.sample.cast.castconnect.data.Movie;
-import com.google.sample.cast.castconnect.data.MovieList;
-import com.google.sample.cast.castconnect.player.VideoPlayerGlue;
+import com.google.sample.cast.atvreceiver.data.Movie;
+import com.google.sample.cast.atvreceiver.data.MovieList;
+import com.google.sample.cast.atvreceiver.player.VideoPlayerGlue;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Copyright 2020 Google LLC. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /**
  * Handles video playback with media controls.
  */

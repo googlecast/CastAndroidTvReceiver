@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.sample.cast.castconnect">
+    package="com.google.sample.cast.atvreceiver">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,12 +16,12 @@
         android:allowBackup="true"
         android:icon="@drawable/cast_video"
         android:label="@string/app_name"
-        android:name="com.google.sample.cast.castconnect.CastDemoApplication"
+        android:name="com.google.sample.cast.atvreceiver.CastDemoApplication"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.google.sample.cast.castconnect.ui.MainActivity"
+            android:name="com.google.sample.cast.atvreceiver.ui.MainActivity"
             android:banner="@drawable/cast_video"
             android:icon="@drawable/cast_video"
             android:label="@string/app_name"
@@ -37,24 +37,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.google.sample.cast.castconnect.ui.PlaybackActivity"
+            android:name="com.google.sample.cast.atvreceiver.ui.PlaybackActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="com.google.android.gms.cast.tv.action.LOAD"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter>
+            <!-- Uncomment and populate data fields to enable load by entity deeplinks -->
+            <!--intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"/>
-                <data android:host="atv-cast-connect.firebaseapp.com"/>
+                <data android:host="YOUR-DEEPLINK-HOST-URL"/>
                 <data android:pathPattern=".*"/>
-            </intent-filter>
+            </intent-filter-->
         </activity>
         <meta-data
             android:name="com.google.android.gms.cast.tv.RECEIVER_OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="com.google.sample.cast.castconnect.CastReceiverOptionsProvider" />
+            android:value="com.google.sample.cast.atvreceiver.CastReceiverOptionsProvider" />
     </application>
 </manifest>

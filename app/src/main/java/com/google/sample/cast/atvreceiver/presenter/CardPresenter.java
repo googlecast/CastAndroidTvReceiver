@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.google.sample.cast.castconnect.presenter;
+package com.google.sample.cast.atvreceiver.presenter;
 
 import android.graphics.drawable.Drawable;
 
@@ -26,9 +25,8 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.google.sample.cast.castconnect.data.Movie;
-import com.google.sample.cast.castconnect.R;
-
+import com.google.sample.cast.atvreceiver.data.Movie;
+import com.google.sample.cast.atvreceiver.R;
 /**
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an Image CardView

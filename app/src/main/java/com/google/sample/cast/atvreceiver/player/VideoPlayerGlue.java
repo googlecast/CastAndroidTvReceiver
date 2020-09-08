@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.sample.cast.castconnect.player;
+package com.google.sample.cast.atvreceiver.player;
 
 import android.content.Context;
 import androidx.leanback.media.PlaybackTransportControlGlue;
