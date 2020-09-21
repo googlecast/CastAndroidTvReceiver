@@ -1,10 +1,3 @@
-package com.google.sample.cast.castconnect;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
-import com.google.android.gms.cast.tv.CastReceiverContext;
-
 /**
  * Copyright 2020 Google LLC. All Rights Reserved.
  *
@@ -20,6 +13,13 @@ import com.google.android.gms.cast.tv.CastReceiverContext;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.sample.cast.castconnect;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import com.google.android.gms.cast.tv.CastReceiverContext;
+
 public class AppLifecycleObserver implements DefaultLifecycleObserver {
   @Override
   public void onResume(LifecycleOwner owner) {

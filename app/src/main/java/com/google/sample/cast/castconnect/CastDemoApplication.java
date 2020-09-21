@@ -1,15 +1,3 @@
-package com.google.sample.cast.castconnect;
-
-import android.app.Application;
-
-import android.widget.Toast;
-
-import androidx.lifecycle.ProcessLifecycleOwner;
-
-import com.google.android.gms.cast.tv.CastReceiverContext;
-import com.google.android.gms.cast.tv.SenderDisconnectedEventInfo;
-import com.google.android.gms.cast.tv.SenderInfo;
-
 /**
  * Copyright 2020 Google LLC. All Rights Reserved.
  *
@@ -25,6 +13,18 @@ import com.google.android.gms.cast.tv.SenderInfo;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.sample.cast.castconnect;
+
+import android.app.Application;
+
+import android.widget.Toast;
+
+import androidx.lifecycle.ProcessLifecycleOwner;
+
+import com.google.android.gms.cast.tv.CastReceiverContext;
+import com.google.android.gms.cast.tv.SenderDisconnectedEventInfo;
+import com.google.android.gms.cast.tv.SenderInfo;
+
 public class CastDemoApplication extends Application {
 
     @Override

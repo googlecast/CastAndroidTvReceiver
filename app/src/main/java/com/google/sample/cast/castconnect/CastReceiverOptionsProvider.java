@@ -1,9 +1,3 @@
-package com.google.sample.cast.castconnect;
-
-import android.content.Context;
-import com.google.android.gms.cast.tv.CastReceiverOptions;
-import com.google.android.gms.cast.tv.ReceiverOptionsProvider;
-
 /**
  * Copyright 2020 Google LLC. All Rights Reserved.
  *
@@ -19,6 +13,12 @@ import com.google.android.gms.cast.tv.ReceiverOptionsProvider;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.sample.cast.castconnect;
+
+import android.content.Context;
+import com.google.android.gms.cast.tv.CastReceiverOptions;
+import com.google.android.gms.cast.tv.ReceiverOptionsProvider;
+
 public class CastReceiverOptionsProvider implements ReceiverOptionsProvider {
     @Override
     public CastReceiverOptions getOptions(Context context) {

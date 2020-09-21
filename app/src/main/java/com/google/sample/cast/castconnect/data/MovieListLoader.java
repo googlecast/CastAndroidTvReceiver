@@ -1,11 +1,3 @@
-package com.google.sample.cast.castconnect.data;
-
-import android.content.AsyncTaskLoader;
-import android.content.Context;
-import android.util.Log;
-
-import java.util.List;
-
 /**
  * Copyright 2020 Google LLC. All Rights Reserved.
  *
@@ -21,6 +13,14 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.sample.cast.castconnect.data;
+
+import android.content.AsyncTaskLoader;
+import android.content.Context;
+import android.util.Log;
+
+import java.util.List;
+
 public class MovieListLoader extends AsyncTaskLoader<List<Movie>> {
 
     private static final String TAG = "MovieListLoader";

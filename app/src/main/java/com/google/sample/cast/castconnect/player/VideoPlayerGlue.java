@@ -1,13 +1,3 @@
-package com.google.sample.cast.castconnect.player;
-
-import android.content.Context;
-import androidx.leanback.media.PlaybackTransportControlGlue;
-import androidx.leanback.widget.Action;
-import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.PlaybackControlsRow;
-import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Copyright 2020 Google LLC. All Rights Reserved.
  *
@@ -23,6 +13,16 @@ import java.util.concurrent.TimeUnit;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.sample.cast.castconnect.player;
+
+import android.content.Context;
+import androidx.leanback.media.PlaybackTransportControlGlue;
+import androidx.leanback.widget.Action;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.PlaybackControlsRow;
+import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter;
+import java.util.concurrent.TimeUnit;
+
 public class VideoPlayerGlue extends PlaybackTransportControlGlue<LeanbackPlayerAdapter> {
 
   private static final long TEN_SECONDS = TimeUnit.SECONDS.toMillis(10);
