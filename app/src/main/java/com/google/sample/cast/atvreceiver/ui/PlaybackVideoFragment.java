@@ -31,6 +31,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.MediaMetadataProvider;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -76,6 +78,10 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
     private Movie playingMovie;
 
     private MediaManager mMediaManager;
+
+    private static final String TYPE_HLS = "application/x-mpegurl";
+    private static final String TYPE_MP4 = "video/mp4";
+    private static String type;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -165,6 +171,7 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         if (intent.hasExtra(MainActivity.MOVIE)) {
             // Intent came from MainActivity (User chose an item inside ATV app).
             Movie movie = (Movie) intent.getSerializableExtra(MainActivity.MOVIE);
+            type = TYPE_HLS;
             startPlayback(movie, 0);
         } else {
             logAndDisplay("Null or unrecognized intent action");
@@ -184,6 +191,8 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         if (mediaInfo == null) {
             return null;
         }
+
+        type = mediaInfo.getContentType();
 
         String videoUrl = mediaInfo.getContentId();
         if (mediaInfo.getContentUrl() != null) {
@@ -240,10 +249,24 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
             getContext(), Util.getUserAgent(getContext(), "castconnect"));
 
-        HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(mediaSourceUri);
+        MediaSource mediaSource;
+        switch (type) {
+            case TYPE_HLS:
+                mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(mediaSourceUri);
+                break;
 
-        mPlayer.prepare(hlsMediaSource);
+            case TYPE_MP4:
+                mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(mediaSourceUri);
+                break;
+
+            default:
+                mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(mediaSourceUri);
+                Log.d(LOG_TAG, "Unrecognized MediaSource");
+        }
+        mPlayer.prepare(mediaSource);
     }
 
     private void logAndDisplay(String error) {
@@ -303,6 +326,7 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
 
     private void myFillMediaInfo(MediaInfoWriter mediaInfoWriter) {
         MediaInfo mediaInfo = mediaInfoWriter.getMediaInfo();
+        Log.d(LOG_TAG,"***Type:"+mediaInfo.getContentType());
         if (mediaInfo.getContentUrl() == null && mediaInfo.getEntity() != null) {
             // Load By Entity
             String entity = mediaInfo.getEntity();
