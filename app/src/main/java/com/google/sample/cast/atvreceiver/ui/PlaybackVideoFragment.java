@@ -52,6 +52,7 @@ import com.google.android.gms.cast.tv.media.MediaStatusWriter;
 import com.google.android.gms.common.images.WebImage;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.sample.cast.atvreceiver.R;
 import com.google.sample.cast.atvreceiver.data.Movie;
 import com.google.sample.cast.atvreceiver.data.MovieList;
 import com.google.sample.cast.atvreceiver.player.VideoPlayerGlue;
@@ -247,7 +248,7 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
 
     private void prepareMediaForPlaying(Uri mediaSourceUri) {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
-            getContext(), Util.getUserAgent(getContext(), "castconnect"));
+            getContext(), Util.getUserAgent(getContext(), getString(R.string.app_name)));
 
         MediaSource mediaSource;
         switch (type) {

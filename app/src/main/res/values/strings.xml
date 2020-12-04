@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Cast Connect</string>
-    <string name="browse_title"><![CDATA[Cast Connect Sample App]]></string>
+    <string name="app_name">Cast Videos</string>
+    <string name="browse_title"><![CDATA[Cast ATV Sample App]]></string>
     <string name="related_movies">Related Videos</string>
     <string name="watch_trailer_1">Watch video</string>
     <string name="watch_trailer_2">FREE</string>

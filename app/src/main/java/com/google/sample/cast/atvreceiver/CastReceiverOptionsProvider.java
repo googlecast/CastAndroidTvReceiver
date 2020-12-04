@@ -24,7 +24,7 @@ public class CastReceiverOptionsProvider implements ReceiverOptionsProvider {
     public CastReceiverOptions getOptions(Context context) {
         return new CastReceiverOptions.Builder(context)
                 .setVersionCode(1)
-                .setStatusText("Cast Connect Sample App")
+                .setStatusText("Cast ATV Sample Receiver")
                 .build();
     }
 }
