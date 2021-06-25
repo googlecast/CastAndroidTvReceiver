@@ -22,21 +22,17 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.widget.Toast;
+
 import androidx.leanback.app.VideoSupportFragment;
 import androidx.leanback.app.VideoSupportFragmentGlueHost;
 import androidx.leanback.widget.PlaybackControlsRow;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.MediaMetadataProvider;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.google.android.gms.cast.MediaError;
 import com.google.android.gms.cast.MediaError.DetailedErrorCode;
 import com.google.android.gms.cast.MediaInfo;
@@ -52,13 +48,14 @@ import com.google.android.gms.cast.tv.media.MediaStatusWriter;
 import com.google.android.gms.common.images.WebImage;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.sample.cast.atvreceiver.R;
 import com.google.sample.cast.atvreceiver.data.Movie;
 import com.google.sample.cast.atvreceiver.data.MovieList;
 import com.google.sample.cast.atvreceiver.player.VideoPlayerGlue;
-import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Handles video playback with media controls.
@@ -71,7 +68,7 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
     private MediaSessionCompat mMediaSession;
     private MediaSessionConnector mMediaSessionConnector;
 
-    private SimpleExoPlayer mPlayer;
+    private Player mPlayer;
     private LeanbackPlayerAdapter mPlayerAdapter;
     private VideoPlayerGlue mPlayerGlue;
     private PlaylistActionListener mPlaylistActionListener;
@@ -80,16 +77,12 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
 
     private MediaManager mMediaManager;
 
-    private static final String TYPE_HLS = "application/x-mpegurl";
-    private static final String TYPE_MP4 = "video/mp4";
-    private static String type;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "onCreate");
 
-        mMediaSession = new MediaSessionCompat(getContext(), LOG_TAG);
+        mMediaSession = new MediaSessionCompat(requireContext(), LOG_TAG);
         mMediaSessionConnector = new MediaSessionConnector(mMediaSession);
         initializePlayer();
     }
@@ -119,14 +112,14 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         mMediaSessionConnector.setMediaMetadataProvider(mMediaMetadataProvider);
         mMediaSession.setActive(true);
 
-        if (mMediaManager.onNewIntent(getActivity().getIntent())) {
+        if (mMediaManager.onNewIntent(requireActivity().getIntent())) {
             // If the SDK recognizes the intent, you should early return.
             return;
         }
 
         // If the SDK doesn't recognize the intent, you can handle the intent with
         // your own logic.
-        processIntent(getActivity().getIntent());
+        processIntent(requireActivity().getIntent());
 
     }
 
@@ -155,15 +148,13 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         mMediaSession.release();
         mMediaManager.setSessionCompatToken(null);
         releasePlayer();
-        Intent intent = new Intent(getContext(), MainActivity.class);
-        startActivity(intent);
     }
 
     @Override
     public void onError(int errorCode, CharSequence errorMessage) {
         Log.d(LOG_TAG, "onError");
         logAndDisplay(errorMessage.toString());
-        getActivity().finish();
+        requireActivity().finish();
     }
 
     void processIntent(Intent intent) {
@@ -172,11 +163,10 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         if (intent.hasExtra(MainActivity.MOVIE)) {
             // Intent came from MainActivity (User chose an item inside ATV app).
             Movie movie = (Movie) intent.getSerializableExtra(MainActivity.MOVIE);
-            type = TYPE_HLS;
             startPlayback(movie, 0);
         } else {
             logAndDisplay("Null or unrecognized intent action");
-            getActivity().finish();
+            requireActivity().finish();
         }
     }
 
@@ -192,8 +182,6 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         if (mediaInfo == null) {
             return null;
         }
-
-        type = mediaInfo.getContentType();
 
         String videoUrl = mediaInfo.getContentId();
         if (mediaInfo.getContentUrl() != null) {
@@ -217,8 +205,8 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
             VideoSupportFragmentGlueHost glueHost =
                 new VideoSupportFragmentGlueHost(PlaybackVideoFragment.this);
 
-            mPlayer = ExoPlayerFactory.newSimpleInstance(getContext());
-            mPlayerAdapter = new LeanbackPlayerAdapter(getContext(), mPlayer, UPDATE_DELAY);
+            mPlayer = new SimpleExoPlayer.Builder(requireContext()).build();
+            mPlayerAdapter = new LeanbackPlayerAdapter(requireContext(), mPlayer, UPDATE_DELAY);
             mPlayerAdapter.setRepeatAction(PlaybackControlsRow.RepeatAction.INDEX_NONE);
             mPlaylistActionListener = new PlaylistActionListener();
             mMediaMetadataProvider = new MyMediaMetadataProvider();
@@ -241,33 +229,13 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
         playingMovie = movie;
         mPlayerGlue.setTitle(movie.getTitle());
         mPlayerGlue.setSubtitle(movie.getDescription());
-        prepareMediaForPlaying(Uri.parse(movie.getVideoUrl()));
+
+        MediaItem mediaItem = MediaItem.fromUri(movie.getVideoUrl());
+        mPlayer.setMediaItem(mediaItem);
+        mPlayer.prepare();
         mPlayerGlue.playWhenPrepared();
+        mPlayerGlue.seekTo(startPosition);
         mMediaManager.getMediaStatusModifier().clear();
-    }
-
-    private void prepareMediaForPlaying(Uri mediaSourceUri) {
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
-            getContext(), Util.getUserAgent(getContext(), getString(R.string.app_name)));
-
-        MediaSource mediaSource;
-        switch (type) {
-            case TYPE_HLS:
-                mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaSourceUri);
-                break;
-
-            case TYPE_MP4:
-                mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaSourceUri);
-                break;
-
-            default:
-                mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaSourceUri);
-                Log.d(LOG_TAG, "Unrecognized MediaSource");
-        }
-        mPlayer.prepare(mediaSource);
     }
 
     private void logAndDisplay(String error) {
