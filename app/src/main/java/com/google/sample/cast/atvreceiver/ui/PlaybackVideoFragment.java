@@ -18,7 +18,7 @@ package com.google.sample.cast.atvreceiver.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,7 +32,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.leanback.LeanbackPlayerAdapter;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector.MediaMetadataProvider;
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator;
 import com.google.android.gms.cast.MediaError;
 import com.google.android.gms.cast.MediaError.DetailedErrorCode;
 import com.google.android.gms.cast.MediaInfo;
@@ -55,6 +55,7 @@ import com.google.sample.cast.atvreceiver.player.VideoPlayerGlue;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,8 +73,6 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
     private LeanbackPlayerAdapter mPlayerAdapter;
     private VideoPlayerGlue mPlayerGlue;
     private PlaylistActionListener mPlaylistActionListener;
-    private MyMediaMetadataProvider mMediaMetadataProvider;
-    private Movie playingMovie;
 
     private MediaManager mMediaManager;
 
@@ -109,7 +108,23 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
 
         initializePlayer();
         mMediaSessionConnector.setPlayer(mPlayer);
-        mMediaSessionConnector.setMediaMetadataProvider(mMediaMetadataProvider);
+
+        TimelineQueueNavigator timelineQueueNavigator = new TimelineQueueNavigator(mMediaSession) {
+            @Override
+            public MediaDescriptionCompat getMediaDescription(Player player, int windowIndex) {
+                com.google.android.exoplayer2.MediaMetadata mediaMetadata =
+                        player.getMediaItemAt(windowIndex).mediaMetadata;
+
+                return new MediaDescriptionCompat.Builder()
+                        .setMediaUri(mediaMetadata.mediaUri)
+                        .setIconUri(mediaMetadata.artworkUri)
+                        .setTitle(mediaMetadata.title)
+                        .setSubtitle(mediaMetadata.subtitle)
+                        .build();
+            }
+        };
+        mMediaSessionConnector.setQueueNavigator(timelineQueueNavigator);
+
         mMediaSession.setActive(true);
 
         if (mMediaManager.onNewIntent(requireActivity().getIntent())) {
@@ -209,10 +224,26 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
             mPlayerAdapter = new LeanbackPlayerAdapter(requireContext(), mPlayer, UPDATE_DELAY);
             mPlayerAdapter.setRepeatAction(PlaybackControlsRow.RepeatAction.INDEX_NONE);
             mPlaylistActionListener = new PlaylistActionListener();
-            mMediaMetadataProvider = new MyMediaMetadataProvider();
             mPlayerGlue = new VideoPlayerGlue(getContext(), mPlayerAdapter, mPlaylistActionListener);
             mPlayerGlue.setHost(glueHost);
             mPlayerGlue.setSeekEnabled(true);
+
+            mPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onMediaItemTransition(MediaItem mediaItem, int reason) {
+                    CharSequence title = "";
+                    CharSequence subtitle = "";
+                    if (mediaItem != null) {
+                        // mediaIem is null if player has been stopped or
+                        // all media items have been removed from the playlist
+                        title = mediaItem.mediaMetadata.title;
+                        subtitle = mediaItem.mediaMetadata.subtitle;
+                    }
+                    mMediaManager.getMediaStatusModifier().clear();
+                    mPlayerGlue.setTitle(title);
+                    mPlayerGlue.setSubtitle(subtitle);
+                }
+            });
         }
     }
 
@@ -226,12 +257,35 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
     }
 
     private void startPlayback(Movie movie, long startPosition) {
-        playingMovie = movie;
-        mPlayerGlue.setTitle(movie.getTitle());
-        mPlayerGlue.setSubtitle(movie.getDescription());
+        List<MediaItem> mediaItems = new ArrayList<>();
 
-        MediaItem mediaItem = MediaItem.fromUri(movie.getVideoUrl());
-        mPlayer.setMediaItem(mediaItem);
+        MediaItem firstMediaItem = new MediaItem.Builder()
+            .setUri(movie.getVideoUrl())
+            .setMediaMetadata(
+                new com.google.android.exoplayer2.MediaMetadata.Builder()
+                    .setMediaUri(Uri.parse(movie.getVideoUrl()))
+                    .setArtworkUri(Uri.parse(movie.getCardImageUrl()))
+                    .setTitle(movie.getTitle())
+                    .setSubtitle(movie.getDescription())
+                    .build()
+            ).build();
+        mediaItems.add(firstMediaItem);
+
+        MovieList.getList().forEach( movieItem -> {
+            mediaItems.add(new MediaItem.Builder()
+                .setUri(movieItem.getVideoUrl())
+                .setMediaMetadata(
+                    new com.google.android.exoplayer2.MediaMetadata.Builder()
+                        .setMediaUri(Uri.parse(movieItem.getVideoUrl()))
+                        .setArtworkUri(Uri.parse(movieItem.getCardImageUrl()))
+                        .setTitle(movieItem.getTitle())
+                        .setSubtitle(movieItem.getDescription())
+                        .build()
+                ).build()
+            );
+        });
+
+        mPlayer.setMediaItems(mediaItems);
         mPlayer.prepare();
         mPlayerGlue.playWhenPrepared();
         mPlayerGlue.seekTo(startPosition);
@@ -244,52 +298,14 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
     }
 
     class PlaylistActionListener implements VideoPlayerGlue.OnActionClickedListener {
-
-        private List<Movie> mPlaylist;
-
-        PlaylistActionListener() {
-            this.mPlaylist = MovieList.getList();
-        }
-
         @Override
         public void onPrevious() {
-            int currentIndex = playingMovie.getId();
-            if (currentIndex - 1 >= 0) {
-                startPlayback(mPlaylist.get(currentIndex - 1),0);
-            }
+            mPlayer.previous();
         }
 
         @Override
         public void onNext() {
-            int currentIndex = playingMovie.getId();
-            if (currentIndex + 1 < mPlaylist.size()) {
-                startPlayback(mPlaylist.get(currentIndex + 1), 0);
-            }
-        }
-    }
-
-    class MyMediaMetadataProvider implements MediaMetadataProvider {
-        @Override
-        public MediaMetadataCompat getMetadata(Player player) {
-            MediaMetadataCompat.Builder mediaMetadata = new MediaMetadataCompat.Builder();
-            if (playingMovie != null) {
-                mediaMetadata.putString(
-                    MediaMetadataCompat.METADATA_KEY_TITLE, playingMovie.getTitle());
-                mediaMetadata.putString(
-                    MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, playingMovie.getTitle());
-                mediaMetadata.putString(
-                    MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
-                    playingMovie.getDescription());
-                mediaMetadata.putString(
-                    MediaMetadataCompat.METADATA_KEY_MEDIA_URI, playingMovie.getVideoUrl());
-                mediaMetadata.putString(
-                    MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
-                    playingMovie.getCardImageUrl());
-            }
-            mediaMetadata.putLong(
-                MediaMetadataCompat.METADATA_KEY_DURATION, mPlayerGlue.getDuration());
-
-            return mediaMetadata.build();
+            mPlayer.next();
         }
     }
 
