@@ -116,7 +116,6 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
                         player.getMediaItemAt(windowIndex).mediaMetadata;
 
                 return new MediaDescriptionCompat.Builder()
-                        .setMediaUri(mediaMetadata.mediaUri)
                         .setIconUri(mediaMetadata.artworkUri)
                         .setTitle(mediaMetadata.title)
                         .setSubtitle(mediaMetadata.subtitle)
@@ -263,7 +262,6 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
             .setUri(movie.getVideoUrl())
             .setMediaMetadata(
                 new com.google.android.exoplayer2.MediaMetadata.Builder()
-                    .setMediaUri(Uri.parse(movie.getVideoUrl()))
                     .setArtworkUri(Uri.parse(movie.getCardImageUrl()))
                     .setTitle(movie.getTitle())
                     .setSubtitle(movie.getDescription())
@@ -276,7 +274,6 @@ public class PlaybackVideoFragment extends VideoSupportFragment {
                 .setUri(movieItem.getVideoUrl())
                 .setMediaMetadata(
                     new com.google.android.exoplayer2.MediaMetadata.Builder()
-                        .setMediaUri(Uri.parse(movieItem.getVideoUrl()))
                         .setArtworkUri(Uri.parse(movieItem.getCardImageUrl()))
                         .setTitle(movieItem.getTitle())
                         .setSubtitle(movieItem.getDescription())
