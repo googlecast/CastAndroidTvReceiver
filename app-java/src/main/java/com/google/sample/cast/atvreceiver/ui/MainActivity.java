@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.sample.cast.atvreceiver.ui
+package com.google.sample.cast.atvreceiver.ui;
 
-import android.app.Activity
-import android.os.Bundle
-import com.google.sample.cast.atvreceiver.R
-
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import com.google.sample.cast.atvreceiver.R;
 /**
- * Main Activity class that loads [MainFragment].
+ * Main Activity class that loads {@link MainFragment}.
  */
-class MainActivity : Activity() {
-    public override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+public class MainActivity extends Activity {
+
+    public static final String MOVIE = "Movie";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("MainActivity ","onCreate");
+        setContentView(R.layout.activity_main);
     }
 
-    companion object {
-        const val MOVIE = "Movie"
-    }
 }

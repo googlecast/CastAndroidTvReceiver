@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.sample.cast.atvreceiver.ui
+package com.google.sample.cast.atvreceiver;
 
-import android.app.Activity
-import android.os.Bundle
-import com.google.sample.cast.atvreceiver.R
+import android.content.Context;
+import com.google.android.gms.cast.tv.CastReceiverOptions;
+import com.google.android.gms.cast.tv.ReceiverOptionsProvider;
 
-/**
- * Main Activity class that loads [MainFragment].
- */
-class MainActivity : Activity() {
-    public override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
-
-    companion object {
-        const val MOVIE = "Movie"
+public class CastReceiverOptionsProvider implements ReceiverOptionsProvider {
+    @Override
+    public CastReceiverOptions getOptions(Context context) {
+        return new CastReceiverOptions.Builder(context)
+                .setVersionCode(1)
+                .setStatusText("Cast ATV Sample Receiver")
+                .build();
     }
 }
