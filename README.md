@@ -20,7 +20,7 @@ This sample shows how to develop a Cast Connect-enabled Android TV app.
 
 ## How to report bugs
 * [Google Cast SDK Support](https://developers.google.com/cast/support)
-* For sample app issues, open an issue on this GitHub repo.
+* [Sample App Issues](https://issuetracker.google.com/issues/new?component=190205&template=1901999)
 
 ## Contributions
 Please read and follow the steps in the [CONTRIBUTING.md](CONTRIBUTING.md).
